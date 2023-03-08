@@ -1,4 +1,12 @@
+import 'dart:convert';
+
 import 'Company.dart';
+
+List<Employee> employeeModelFromJson(String str) =>
+    List<Employee>.from(json.decode(str).map((x) => Employee.fromJson(x)));
+
+String employeeModelToJson(List<Employee> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Employee {
   int? employeeId;
@@ -11,15 +19,15 @@ class Employee {
       {this.employeeId,
       this.name,
       this.lastName,
-      this.company,
-      this.privileges});
+    this.company,
+    this.privileges});
 
   Employee.fromJson(Map<String, dynamic> json) {
     employeeId = json['employeeId'];
     name = json['name'];
     lastName = json['lastName'];
     company =
-        json['company'] != null ? new Company.fromJson(json['company']) : null;
+    json['company'] != null ? new Company.fromJson(json['company']) : null;
     privileges = json['privileges'];
   }
 

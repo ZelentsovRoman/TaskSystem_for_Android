@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tasksystem_for_android/routes/EmployeeList.dart';
 
 import '../models/Task.dart';
 import '../models/User.dart';
@@ -29,7 +30,7 @@ class _TasksState extends State<Tasks> {
     final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
         GlobalKey<RefreshIndicatorState>();
     return Scaffold(
-        backgroundColor: const Color(0xFFF0F0F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         title: Text('Задачи'),
         backgroundColor: Color(0xFF2D3748),
@@ -37,7 +38,7 @@ class _TasksState extends State<Tasks> {
       drawer: Drawer(
         backgroundColor: Color(0xFF2D3748),
         child: Column(
-          children: const <Widget>[
+          children: <Widget>[
             SizedBox(
               height: 80,
               child: DrawerHeader(
@@ -60,6 +61,7 @@ class _TasksState extends State<Tasks> {
               color: Colors.white,
             ),
             ListTile(
+              shape: Border(left: BorderSide(color: Colors.white, width: 7)),
               iconColor: Colors.white,
               tileColor: Colors.blueGrey,
               leading: Icon(Icons.description, size: 40),
@@ -75,6 +77,10 @@ class _TasksState extends State<Tasks> {
                 'Список сотрудников',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => EmployeeList()));
+              },
             ),
             Expanded(child: Text('')),
             ListTile(
@@ -100,6 +106,7 @@ class _TasksState extends State<Tasks> {
                 'Выйти',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: logout,
             ),
           ],
         ),
@@ -110,26 +117,42 @@ class _TasksState extends State<Tasks> {
         children: [
           Expanded(
               child: RefreshIndicator(
-            onRefresh: getData,
-            key: _refreshIndicatorKey,
-            child: ListView.builder(
-              itemCount: list?.length,
-              itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Text('${list?[index].taskId}'),
-                      flex: 1,
-                    ),
-                    Expanded(
-                      child: Text('${list?[index].description}'),
-                      flex: 2,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ))
+                  onRefresh: getData,
+                  key: _refreshIndicatorKey,
+                  child: list?.length != 0
+                      ? ListView.builder(
+                          itemCount: list?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                height: 100,
+                                margin: EdgeInsets.all(10),
+                                // <-- Red color provided to below Row
+                                child: Row(
+                                  // mainAxisAlignment: MainAxisAlignment.,
+                                  children: [
+                                    Text('#${list?[index].taskId}'),
+                                    Text('${list?[index].description}',
+                                        overflow: TextOverflow.fade),
+                                  ],
+                                ));
+                          },
+                        )
+                      : ListView(
+                          children: [
+                            Container(
+                              child: Center(
+                                child: Text('Задачи отсутствуют',
+                                    style: TextStyle(
+                                        fontSize: 24, color: Colors.grey)),
+                              ),
+                              height: 500,
+                            )
+                          ],
+                        )))
         ],
       )),
       floatingActionButton: FloatingActionButton(
@@ -148,6 +171,13 @@ class _TasksState extends State<Tasks> {
     } else {
       list = await taskAPI().tasksForUser(user);
     }
+    setState(() {});
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     setState(() {});
   }
 }
