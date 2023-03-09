@@ -21,7 +21,6 @@ class _HomeState extends State<Home> {
     dynamic temp = (await taskAPI().auth(user));
     if (temp != null) {
       _user = temp;
-      // Future.delayed(const Duration(seconds: 2)).then((value) => setState((){}));
       return true;
     } else {
       return false;
@@ -110,6 +109,10 @@ class _HomeState extends State<Home> {
                                 Navigator.pushNamedAndRemoveUntil(
                                     context, '/Tasks', (route) => false);
                               } else {
+                                setState(() {
+                                  ScaffoldMessenger.of(context)
+                                      .clearSnackBars();
+                                });
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content:

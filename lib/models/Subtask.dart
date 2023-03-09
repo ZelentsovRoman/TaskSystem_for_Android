@@ -7,12 +7,12 @@ String subtaskModelToJson(List<Subtask> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Subtask {
-  final int subtaskId;
-  final String description;
-  final bool value;
-  final int taskId;
+  int? subtaskId;
+  String? description;
+  bool? value;
+  int? taskId;
 
-  Subtask(this.subtaskId, this.description, this.value, this.taskId);
+  Subtask(this.description, this.value, {this.taskId, this.subtaskId});
 
   Subtask.fromJson(Map<String, dynamic> json)
       : subtaskId = json['subtaskId'],

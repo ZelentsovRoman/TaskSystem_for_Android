@@ -7,6 +7,7 @@ import 'package:tasksystem_for_android/routes/EmployeeList.dart';
 import '../models/Task.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
+import 'AddTask.dart';
 
 class Tasks extends StatefulWidget {
   const Tasks({Key? key}) : super(key: key);
@@ -34,6 +35,15 @@ class _TasksState extends State<Tasks> {
       appBar: AppBar(
         title: Text('Задачи'),
         backgroundColor: Color(0xFF2D3748),
+        actions: [
+          if (user?.employee?.privileges == 'Admin')
+            IconButton(
+                onPressed: () => {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => AddTask()))
+                    },
+                icon: Icon(Icons.add))
+        ],
       ),
       drawer: Drawer(
         backgroundColor: Color(0xFF2D3748),
@@ -70,27 +80,20 @@ class _TasksState extends State<Tasks> {
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
             ),
-            ListTile(
-              iconColor: Colors.white,
-              leading: Icon(Icons.people, size: 40),
-              title: Text(
-                'Список сотрудников',
-                style: TextStyle(fontSize: 20, color: Colors.white),
+            if (user?.employee?.privileges == 'Admin')
+              ListTile(
+                iconColor: Colors.white,
+                leading: Icon(Icons.people, size: 40),
+                title: Text(
+                  'Список сотрудников',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => EmployeeList()));
+                },
               ),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => EmployeeList()));
-              },
-            ),
             Expanded(child: Text('')),
-            ListTile(
-              iconColor: Colors.white,
-              leading: Icon(Icons.group_add, size: 40),
-              title: Text(
-                'Добавление сотрудника',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ),
             ListTile(
               iconColor: Colors.white,
               leading: Icon(Icons.person, size: 40),
@@ -119,29 +122,8 @@ class _TasksState extends State<Tasks> {
               child: RefreshIndicator(
                   onRefresh: getData,
                   key: _refreshIndicatorKey,
-                  child: list?.length != 0
-                      ? ListView.builder(
-                          itemCount: list?.length ?? 0,
-                          itemBuilder: (context, index) {
-                            return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                height: 100,
-                                margin: EdgeInsets.all(10),
-                                // <-- Red color provided to below Row
-                                child: Row(
-                                  // mainAxisAlignment: MainAxisAlignment.,
-                                  children: [
-                                    Text('#${list?[index].taskId}'),
-                                    Text('${list?[index].description}',
-                                        overflow: TextOverflow.fade),
-                                  ],
-                                ));
-                          },
-                        )
-                      : ListView(
+                  child: list?.length == 0
+                      ? ListView(
                           children: [
                             Container(
                               child: Center(
@@ -152,14 +134,131 @@ class _TasksState extends State<Tasks> {
                               height: 500,
                             )
                           ],
+                        )
+                      : ListView.builder(
+                          itemCount: list?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
+                                ),
+                                height: 150,
+                                margin: EdgeInsets.all(10),
+                                // <-- Red color provided to below Row
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            list?[index].statusId?.statusId == 1
+                                                ? Colors.red
+                                                : Colors.green,
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(8),
+                                            bottomLeft: Radius.circular(8)),
+                                      ),
+                                    ),
+                                    Expanded(
+                                        child: Padding(
+                                      padding: EdgeInsets.all(15),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Задача #${list?[index].taskId}',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
+                                              ),
+                                              Text(
+                                                'от ${list?[index].date?.substring(1, 10)}',
+                                                style: TextStyle(
+                                                    // fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                            ],
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                          ),
+                                          Text(
+                                            list?[index].description != ''
+                                                ? '${list?[index].description}'
+                                                : 'Описание отсутствует',
+                                            overflow: TextOverflow.fade,
+                                            maxLines: 2,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.person,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                          '${list?[index].employeeId?.lastName} ${list?[index].employeeId?.name?[0]}.'),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .add_moderator_sharp,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                          '${list?[index].userId?.employee?.lastName} ${list?[index].userId?.employee?.name?[0]}.'),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.event,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                          '${list?[index].dateStart}'),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.event_available,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                          '${list?[index].dateEnd}'),
+                                                    ],
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ))
+                                  ],
+                                ));
+                          },
                         )))
         ],
       )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Color(0xFF2D3748),
-        child: Icon(Icons.add),
-      ),
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Employee.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
+import 'AddEmployee.dart';
 import 'Tasks.dart';
 
 class EmployeeList extends StatefulWidget {
@@ -34,6 +35,14 @@ class _EmployeeListState extends State<EmployeeList> {
       appBar: AppBar(
         title: Text('Список сотрудников'),
         backgroundColor: Color(0xFF2D3748),
+        actions: [
+          IconButton(
+              onPressed: () => {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => AddEmployee()))
+                  },
+              icon: Icon(Icons.add))
+        ],
       ),
       drawer: Drawer(
         backgroundColor: Color(0xFF2D3748),
@@ -85,14 +94,6 @@ class _EmployeeListState extends State<EmployeeList> {
             Expanded(child: Text('')),
             ListTile(
               iconColor: Colors.white,
-              leading: Icon(Icons.group_add, size: 40),
-              title: Text(
-                'Добавление сотрудника',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ),
-            ListTile(
-              iconColor: Colors.white,
               leading: Icon(Icons.person, size: 40),
               title: Text(
                 'Профиль',
@@ -134,15 +135,42 @@ class _EmployeeListState extends State<EmployeeList> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('${list?[index].name}'),
-                        Text('${list?[index].lastName}'),
+                        Flexible(
+                          child: Text(
+                            '${list?[index].name}',
+                            style: TextStyle(overflow: TextOverflow.fade),
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            '${list?[index].lastName}',
+                            style: TextStyle(overflow: TextOverflow.fade),
+                          ),
+                        ),
                         Text('Права доступа: \n${list?[index].privileges}'),
                         if (list![index].employeeId !=
                             user?.employee?.employeeId)
                           IconButton(
-                              onPressed: () {
-                                deleteEmployee(list![index]);
-                              },
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
+                                        title: Text('Удаление'),
+                                        content: Text(
+                                            'Вы точно хотите удалить пользователя?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(
+                                                context, 'Cancel'),
+                                            child: const Text('Отмена'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                deleteEmployee(list![index]),
+                                            child: const Text('Удалить'),
+                                          ),
+                                        ],
+                                      )),
                               icon: Icon(Icons.delete))
                       ],
                     ));
@@ -172,6 +200,7 @@ class _EmployeeListState extends State<EmployeeList> {
     bool resp = await taskAPI().deleteUser(employee);
     if (resp) {
       await getData();
+      Navigator.pop(context);
       setState(() {});
     } else
       ScaffoldMessenger.of(context).showSnackBar(

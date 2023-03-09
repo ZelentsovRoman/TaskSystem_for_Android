@@ -6,7 +6,7 @@ class User {
   String? login;
   String? password;
 
-  User(this.login, this.password, {this.userId, this.employee});
+  User(this.login, this.password, {this.employee, this.userId});
 
   User.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];

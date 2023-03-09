@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../models/Company.dart';
+import '../models/Employee.dart';
+import '../models/User.dart';
+import '../taskAPI.dart';
+import 'Home.dart';
+
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
 
@@ -133,14 +139,40 @@ class _RegisterState extends State<Register> {
                             )),
                         const Padding(padding: EdgeInsets.only(top: 30)),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text(
-                                    'Проверка $name $lastName $company $login $password'),
-                                backgroundColor: Colors.black,
-                              ));
+                              setState(() {
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                              });
+                              late SnackBar snackbar;
+                              bool check = false;
+                              Company comp = Company(company);
+                              Company? getCompany = await checkCompany(comp);
+                              if (getCompany?.name != comp.name) {
+                                User user = User(login, password);
+                                User? getUser = await checkUser(user);
+                                if (getUser?.login != user.login) {
+                                  Employee employee =
+                                      Employee(name, lastName, 'Admin');
+                                  save(user, employee, comp);
+                                } else {
+                                  check = true;
+                                  snackbar = SnackBar(
+                                    content: Text(
+                                        'Пользователь с таким логином уже существует'),
+                                  );
+                                }
+                              } else {
+                                check = true;
+                                snackbar = SnackBar(
+                                  content: Text(
+                                      'Компания с таким названием уже существует'),
+                                );
+                              }
+                              if (check) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackbar);
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -157,5 +189,26 @@ class _RegisterState extends State<Register> {
         ],
       )),
     );
+  }
+
+  Future<User?> checkUser(User user) async {
+    return await taskAPI().checkUser(user);
+  }
+
+  Future<Company?> checkCompany(Company company) async {
+    return await taskAPI().checkCompany(company);
+  }
+
+  Future<void> save(User user, Employee employee, Company company) async {
+    dynamic getCompany = await taskAPI().saveCompany(company);
+    employee.company = getCompany;
+    dynamic getEmployee = await taskAPI().saveEmployee(employee);
+    user.employee = getEmployee;
+    bool resp = await taskAPI().saveUser(user);
+    if (resp) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => Home()));
+      setState(() {});
+    }
   }
 }

@@ -1,9 +1,19 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'Company.dart';
 
 List<Employee> employeeModelFromJson(String str) =>
     List<Employee>.from(json.decode(str).map((x) => Employee.fromJson(x)));
+
+List<DropdownMenuItem<Employee>> employeeDropDownModelFromJson(String str) =>
+    List<
+        DropdownMenuItem<
+            Employee>>.from(json.decode(str).map((x) => DropdownMenuItem(
+        child: Text(
+            '${Employee.fromJson(x).name} ${Employee.fromJson(x).lastName}'),
+        value: Employee.fromJson(x))));
 
 String employeeModelToJson(List<Employee> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
@@ -15,19 +25,15 @@ class Employee {
   Company? company;
   String? privileges;
 
-  Employee(
-      {this.employeeId,
-      this.name,
-      this.lastName,
-    this.company,
-    this.privileges});
+  Employee(this.name, this.lastName, this.privileges,
+      {this.employeeId, this.company});
 
   Employee.fromJson(Map<String, dynamic> json) {
     employeeId = json['employeeId'];
     name = json['name'];
     lastName = json['lastName'];
     company =
-    json['company'] != null ? new Company.fromJson(json['company']) : null;
+        json['company'] != null ? new Company.fromJson(json['company']) : null;
     privileges = json['privileges'];
   }
 

@@ -2,7 +2,7 @@ class Company {
   int? companyId;
   String? name;
 
-  Company({this.companyId, this.name});
+  Company(this.name, {this.companyId});
 
   Company.fromJson(Map<String, dynamic> json) {
     companyId = json['companyId'];

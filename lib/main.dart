@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tasksystem_for_android/routes/AddEmployee.dart';
+import 'package:tasksystem_for_android/routes/AddTask.dart';
 import 'package:tasksystem_for_android/routes/EmployeeList.dart';
 import 'package:tasksystem_for_android/routes/Home.dart';
 import 'package:tasksystem_for_android/routes/Register.dart';
@@ -24,6 +26,8 @@ void main() {
           '/Register': (context) => Register(),
           '/Tasks': (context) => Tasks(),
           '/EmployeeList': (context) => EmployeeList(),
+          '/AddTask': (context) => AddTask(),
+          'AddEmployee': (context) => AddEmployee()
         }));
   });
 }
