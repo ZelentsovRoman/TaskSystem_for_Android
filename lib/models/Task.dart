@@ -19,16 +19,11 @@ class Task {
   String? dateStart;
   String? dateEnd;
   Status? statusId;
+  String? listSubtask;
 
-  Task(
-      {this.employeeId,
-      this.userId,
-      this.taskId,
-      this.description,
-      this.date,
-      this.dateStart,
-      this.dateEnd,
-      this.statusId});
+  Task(this.employeeId, this.userId, this.date, this.dateStart, this.dateEnd,
+      this.statusId,
+      {this.description, this.listSubtask, this.taskId});
 
   Task.fromJson(Map<String, dynamic> json) {
     employeeId = json['employeeId'] != null
@@ -60,6 +55,7 @@ class Task {
     if (this.statusId != null) {
       data['statusId'] = this.statusId!.toJson();
     }
+    data['subtasks'] = this.listSubtask;
     return data;
   }
 }

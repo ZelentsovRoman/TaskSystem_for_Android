@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasksystem_for_android/models/Employee.dart';
+import 'package:tasksystem_for_android/models/Subtask.dart';
 import 'package:tasksystem_for_android/models/Task.dart';
 
 import 'ApiConstants.dart';
 import 'models/Company.dart';
+import 'models/Status.dart';
 import 'models/User.dart';
 
 class taskAPI {
@@ -35,6 +37,17 @@ class taskAPI {
       var response = await http.post(url, body: user?.toJson().toString());
       List<DropdownMenuItem<Employee>> list =
           employeeDropDownModelFromJson(response.body);
+      return list;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<List<Status>?> getStatuses() async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getStatuses);
+      var response = await http.get(url);
+      List<Status> list = statusModelFromJson(response.body);
       return list;
     } catch (e) {
       log(e.toString());
@@ -89,6 +102,22 @@ class taskAPI {
     return false;
   }
 
+  Future<bool> deleteTask(int? index) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.deleteTask + '/$index');
+      var response = await http.post(url);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return false;
+  }
+
   Future<User?> checkUser(User? user) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.findUser);
@@ -129,6 +158,33 @@ class taskAPI {
     }
   }
 
+  Future<Task?> getTask(String? index) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.getTask + '/${index}');
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        return Task.fromJson(jsonDecode(response.body));
+      } else {
+        return null;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<List<Subtask>?> getSubtasks(String? index) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.getSubtasks + '/${index}');
+      var response = await http.get(url);
+      List<Subtask> list = subtaskModelFromJson(response.body);
+      return list;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   Future<Company?> saveCompany(Company? company) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveCompany);
@@ -147,6 +203,36 @@ class taskAPI {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveUser);
       var response = await http.post(url, body: user?.toJson().toString());
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> saveNewTask(Task? task) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveNewTask);
+      var response = await http.post(url, body: task?.toJson().toString());
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> saveTask(Task? task) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveTask);
+      var response = await http.post(url, body: task?.toJson().toString());
       if (response.statusCode == 200) {
         return true;
       } else {

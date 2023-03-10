@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasksystem_for_android/routes/EmployeeList.dart';
+import 'package:tasksystem_for_android/routes/TaskScreen.dart';
 
 import '../models/Task.dart';
 import '../models/User.dart';
@@ -138,123 +140,156 @@ class _TasksState extends State<Tasks> {
                       : ListView.builder(
                           itemCount: list?.length ?? 0,
                           itemBuilder: (context, index) {
-                            return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                height: 150,
-                                margin: EdgeInsets.all(10),
-                                // <-- Red color provided to below Row
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 20,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            list?[index].statusId?.statusId == 1
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TaskScreen(
+                                        string: list![index].taskId.toString()),
+                                  ),
+                                );
+                              },
+                              child: Slidable(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8)),
+                                    ),
+                                    height: 150,
+                                    margin: EdgeInsets.all(10),
+                                    // <-- Red color provided to below Row
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                            color: list?[index]
+                                                        .statusId
+                                                        ?.statusId ==
+                                                    1
                                                 ? Colors.red
                                                 : Colors.green,
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(8),
-                                            bottomLeft: Radius.circular(8)),
-                                      ),
-                                    ),
-                                    Expanded(
-                                        child: Padding(
-                                      padding: EdgeInsets.all(15),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Задача #${list?[index].taskId}',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20),
-                                              ),
-                                              Text(
-                                                'от ${list?[index].date?.substring(1, 10)}',
-                                                style: TextStyle(
-                                                    // fontWeight: FontWeight.bold,
-                                                    fontSize: 18),
-                                              ),
-                                            ],
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(8),
+                                                bottomLeft: Radius.circular(8)),
                                           ),
-                                          Text(
-                                            list?[index].description != ''
-                                                ? '${list?[index].description}'
-                                                : 'Описание отсутствует',
-                                            overflow: TextOverflow.fade,
-                                            maxLines: 2,
-                                          ),
-                                          Row(
+                                        ),
+                                        Expanded(
+                                            child: Padding(
+                                          padding: EdgeInsets.all(15),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Column(
+                                              Row(
                                                 children: [
-                                                  Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.person,
-                                                        color: Colors.grey,
-                                                      ),
-                                                      Text(
-                                                          '${list?[index].employeeId?.lastName} ${list?[index].employeeId?.name?[0]}.'),
-                                                    ],
+                                                  Text(
+                                                    'Задача #${list?[index].taskId}',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20),
                                                   ),
-                                                  Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons
-                                                            .add_moderator_sharp,
-                                                        color: Colors.grey,
-                                                      ),
-                                                      Text(
-                                                          '${list?[index].userId?.employee?.lastName} ${list?[index].userId?.employee?.name?[0]}.'),
-                                                    ],
-                                                  )
+                                                  Text(
+                                                    'от ${list?[index].date?.substring(0, 10)}',
+                                                    style: TextStyle(
+                                                        // fontWeight: FontWeight.bold,
+                                                        fontSize: 18),
+                                                  ),
                                                 ],
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                               ),
-                                              Column(
+                                              Text(
+                                                list?[index].description != ''
+                                                    ? '${list?[index].description}'
+                                                    : 'Описание отсутствует',
+                                                overflow: TextOverflow.fade,
+                                                maxLines: 2,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
-                                                  Row(
+                                                  Column(
                                                     children: [
-                                                      Icon(
-                                                        Icons.event,
-                                                        color: Colors.grey,
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.person,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          Text(
+                                                              '${list?[index].employeeId?.lastName} ${list?[index].employeeId?.name?[0]}.'),
+                                                        ],
                                                       ),
-                                                      Text(
-                                                          '${list?[index].dateStart}'),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .add_moderator_sharp,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          Text(
+                                                              '${list?[index].userId?.employee?.lastName} ${list?[index].userId?.employee?.name?[0]}.'),
+                                                        ],
+                                                      )
                                                     ],
                                                   ),
-                                                  Row(
+                                                  Column(
                                                     children: [
-                                                      Icon(
-                                                        Icons.event_available,
-                                                        color: Colors.grey,
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.event,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          Text(
+                                                              '${list?[index].dateStart}'),
+                                                        ],
                                                       ),
-                                                      Text(
-                                                          '${list?[index].dateEnd}'),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .event_available,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          Text(
+                                                              '${list?[index].dateEnd}'),
+                                                        ],
+                                                      )
                                                     ],
                                                   )
                                                 ],
                                               )
                                             ],
-                                          )
-                                        ],
-                                      ),
-                                    ))
+                                          ),
+                                        ))
+                                      ],
+                                    )),
+                                endActionPane: ActionPane(
+                                  motion: StretchMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      autoClose: true,
+                                      backgroundColor: Colors.red,
+                                      icon: Icons.delete,
+                                      label: 'Удалить',
+                                      onPressed: (BuildContext context) {
+                                        delete(list![index].taskId);
+                                      },
+                                    )
                                   ],
-                                ));
+                                ),
+                              ),
+                            );
                           },
                         )))
         ],
@@ -278,5 +313,16 @@ class _TasksState extends State<Tasks> {
     prefs.clear();
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     setState(() {});
+  }
+
+  Future<bool?> delete(int? index) async {
+    bool resp = await taskAPI().deleteTask(index);
+    if (resp) {
+      await getData();
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Ошибка удаления задачи')));
+    }
   }
 }

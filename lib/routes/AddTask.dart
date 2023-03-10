@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tasksystem_for_android/models/Status.dart';
 import 'package:tasksystem_for_android/models/Subtask.dart';
 import 'package:tasksystem_for_android/routes/EmployeeList.dart';
 import 'package:tasksystem_for_android/routes/Tasks.dart';
 
 import '../models/Employee.dart';
+import '../models/Task.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
 
@@ -21,12 +23,12 @@ class AddTask extends StatefulWidget {
 class _AddTaskState extends State<AddTask> {
   final formKey = GlobalKey<FormState>();
   Employee? employee;
-  User? user;
-  late String description;
+  String? description;
   DateTime date = DateTime.now();
   late DateTime dateStart;
   late DateTime dateEnd;
-  late String statusId;
+  late Status statusId;
+  List<Status>? statuses;
   DateTimeRange? dateTimeRange;
   List<DropdownMenuItem<Employee>>? dropdownvalues;
   final _textEditingController = TextEditingController();
@@ -183,8 +185,6 @@ class _AddTaskState extends State<AddTask> {
                                             dateTimeRange ?? initialDateRange);
                                     if (newDate != null) {
                                       dateTimeRange = newDate;
-                                      print(
-                                          '${DateFormat('dd-MM-yyyy').format(dateTimeRange!.start)} ~ ${DateFormat('dd-MM-yyyy').format(dateTimeRange!.end)}');
                                       _textEditingController
                                         ..text =
                                             '${DateFormat('dd-MM-yyyy').format(dateTimeRange!.start)} ~ ${DateFormat('dd-MM-yyyy').format(dateTimeRange!.end)}';
@@ -288,7 +288,36 @@ class _AddTaskState extends State<AddTask> {
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            if (formKey.currentState!.validate()) {}
+                            if (formKey.currentState!.validate()) {
+                              int checkboxesFilled = 0;
+                              if (listSubtasks?.length != 0) {
+                                for (Subtask item in listSubtasks!) {
+                                  if (item.value == false) {
+                                    checkboxesFilled++;
+                                  }
+                                }
+                                if (checkboxesFilled > 0) {
+                                  statusId = statuses![0];
+                                } else {
+                                  statusId = statuses![1];
+                                }
+                              } else {
+                                statusId = statuses![0];
+                              }
+                              Task task = Task(
+                                  employee,
+                                  _user,
+                                  DateFormat('dd-MM-yyyy').format(date),
+                                  DateFormat('dd-MM-yyyy')
+                                      .format(dateTimeRange!.start),
+                                  DateFormat('dd-MM-yyyy')
+                                      .format(dateTimeRange!.end),
+                                  statusId,
+                                  description: description ?? '\"\"',
+                                  listSubtask:
+                                      subtaskModelToJson(listSubtasks!));
+                              await save(task);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF2D3748),
@@ -313,11 +342,22 @@ class _AddTaskState extends State<AddTask> {
     setState(() {});
   }
 
-  Future<void> save(User user, Employee employee) async {}
+  Future<void> save(Task task) async {
+    bool resp = await taskAPI().saveNewTask(task);
+    if (resp) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => Tasks()));
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Ошибка добавления задачи')));
+    }
+  }
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
     _user = User.fromJson(jsonDecode(prefs.getString('user')!));
+    statuses = await taskAPI().getStatuses();
     dropdownvalues = await taskAPI().getEmployee(_user);
     setState(() {});
   }

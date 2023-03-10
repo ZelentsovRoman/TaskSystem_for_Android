@@ -1,3 +1,11 @@
+import 'dart:convert';
+
+List<Status> statusModelFromJson(String str) =>
+    List<Status>.from(json.decode(str).map((x) => Status.fromJson(x)));
+
+String statusModelToJson(List<Status> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class Status {
   final int statusId;
   final String status;
@@ -9,7 +17,7 @@ class Status {
         status = json['status'];
 
   Map<String, dynamic> toJson() => {
-        'statusId': statusId,
-        'status': status,
-      };
+    'statusId': statusId,
+    'status': status,
+  };
 }
