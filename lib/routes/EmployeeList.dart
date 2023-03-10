@@ -7,6 +7,7 @@ import '../models/Employee.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
 import 'AddEmployee.dart';
+import 'Profile.dart';
 import 'Tasks.dart';
 
 class EmployeeList extends StatefulWidget {
@@ -99,6 +100,10 @@ class _EmployeeListState extends State<EmployeeList> {
                 'Профиль',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Profile()));
+              },
             ),
             ListTile(
               iconColor: Colors.white,

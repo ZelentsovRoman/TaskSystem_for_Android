@@ -12,6 +12,7 @@ import '../models/Employee.dart';
 import '../models/Task.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
+import 'Profile.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({Key? key}) : super(key: key);
@@ -108,6 +109,10 @@ class _AddTaskState extends State<AddTask> {
                 'Профиль',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Profile()));
+              },
             ),
             ListTile(
               iconColor: Colors.white,

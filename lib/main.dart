@@ -7,6 +7,7 @@ import 'package:tasksystem_for_android/routes/AddEmployee.dart';
 import 'package:tasksystem_for_android/routes/AddTask.dart';
 import 'package:tasksystem_for_android/routes/EmployeeList.dart';
 import 'package:tasksystem_for_android/routes/Home.dart';
+import 'package:tasksystem_for_android/routes/Profile.dart';
 import 'package:tasksystem_for_android/routes/Register.dart';
 import 'package:tasksystem_for_android/routes/TaskScreen.dart';
 import 'package:tasksystem_for_android/routes/Tasks.dart';
@@ -37,10 +38,11 @@ void main() {
           '/Tasks': (context) => Tasks(),
           '/EmployeeList': (context) => EmployeeList(),
           '/AddTask': (context) => AddTask(),
-          'AddEmployee': (context) => AddEmployee(),
+          '/AddEmployee': (context) => AddEmployee(),
           '/TaskScreen': (context) => TaskScreen(
                 string: '',
-              )
+              ),
+          '/Profile': (context) => Profile()
         }));
   });
 }

@@ -8,6 +8,7 @@ import 'package:tasksystem_for_android/routes/Tasks.dart';
 import '../models/Employee.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
+import 'Profile.dart';
 
 class AddEmployee extends StatefulWidget {
   const AddEmployee({Key? key}) : super(key: key);
@@ -104,6 +105,10 @@ class _AddEmployeeState extends State<AddEmployee> {
                 'Профиль',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Profile()));
+              },
             ),
             ListTile(
               iconColor: Colors.white,

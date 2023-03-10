@@ -12,6 +12,7 @@ import '../models/Employee.dart';
 import '../models/Task.dart';
 import '../models/User.dart';
 import '../taskAPI.dart';
+import 'Profile.dart';
 
 class TaskScreen extends StatefulWidget {
   TaskScreen({super.key, required this.string});
@@ -29,6 +30,7 @@ class _TaskScreenState extends State<TaskScreen> {
   List<DropdownMenuItem<Employee>>? dropdownvalues;
   final _textEditingController = TextEditingController();
   final _DescriptionController = TextEditingController();
+  final _EmployeeController = TextEditingController();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
   List<Subtask>? listSubtasks;
@@ -48,7 +50,7 @@ class _TaskScreenState extends State<TaskScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
-        title: Text('Задача #${args}'),
+        title: Text('Задача #${widget.string}'),
         backgroundColor: Color(0xFF2D3748),
       ),
       drawer: Drawer(
@@ -109,6 +111,10 @@ class _TaskScreenState extends State<TaskScreen> {
                 'Профиль',
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Profile()));
+              },
             ),
             ListTile(
               iconColor: Colors.white,
@@ -153,8 +159,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                 child: TextFormField(
                                   // enabled: false,
                                   readOnly: true,
-                                  initialValue:
-                                      '${_task!.employeeId!.name} ${_task!.employeeId!.name}',
+                                  controller: _EmployeeController,
                                   decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       isDense: true,
@@ -221,8 +226,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                 child: TextFormField(
                                   // enabled: false,
                                   readOnly: true,
-                                  initialValue:
-                                      '${_task?.dateStart} ~ ${_task?.dateEnd}',
+                                  controller: _textEditingController,
                                   decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       isDense: true,
@@ -407,9 +411,11 @@ class _TaskScreenState extends State<TaskScreen> {
     _user = User.fromJson(jsonDecode(prefs.getString('user')!));
     statuses = await taskAPI().getStatuses();
     dropdownvalues = await taskAPI().getEmployee(_user);
-    _task = await taskAPI().getTask(args);
+    _task = (await taskAPI().getTask(args))!;
     _textEditingController..text = '${_task!.dateStart} ~ ${_task!.dateEnd}';
     _DescriptionController..text = '${_task!.description}';
+    _EmployeeController
+      ..text = '${_task!.employeeId!.name} ${_task!.employeeId!.lastName}';
     listSubtasks = await taskAPI().getSubtasks(args);
     employee = dropdownvalues!
         .firstWhere((element) =>

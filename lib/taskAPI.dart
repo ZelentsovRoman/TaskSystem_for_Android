@@ -118,6 +118,21 @@ class taskAPI {
     return false;
   }
 
+  Future<bool> editUser(User? user) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.editUser);
+      var response = await http.post(url, body: user?.toJson().toString());
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return false;
+  }
+
   Future<User?> checkUser(User? user) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.findUser);
