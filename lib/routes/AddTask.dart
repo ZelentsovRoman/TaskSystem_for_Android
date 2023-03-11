@@ -40,7 +40,7 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   void initState() {
-    getData();
+    updateUser();
     super.initState();
   }
 
@@ -347,6 +347,17 @@ class _AddTaskState extends State<AddTask> {
     setState(() {});
   }
 
+  Future<void> updateUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    _user = User.fromJson(jsonDecode(prefs.getString('user')!));
+    String? response = await taskAPI().updateUser(_user);
+    _user = User.fromJson(jsonDecode(response!));
+    prefs.setString('user', response!);
+    setState(() {
+      getData();
+    });
+  }
+
   Future<void> save(Task task) async {
     bool resp = await taskAPI().saveNewTask(task);
     if (resp) {
@@ -360,8 +371,6 @@ class _AddTaskState extends State<AddTask> {
   }
 
   void getData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _user = User.fromJson(jsonDecode(prefs.getString('user')!));
     statuses = await taskAPI().getStatuses();
     dropdownvalues = await taskAPI().getEmployee(_user);
     setState(() {});

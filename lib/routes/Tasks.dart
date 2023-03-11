@@ -22,7 +22,7 @@ class Tasks extends StatefulWidget {
 class _TasksState extends State<Tasks> {
   @override
   void initState() {
-    getData();
+    updateUser();
     super.initState();
   }
 
@@ -223,6 +223,9 @@ class _TasksState extends State<Tasks> {
                                                         .spaceBetween,
                                                 children: [
                                                   Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Row(
                                                         children: [
@@ -248,6 +251,9 @@ class _TasksState extends State<Tasks> {
                                                     ],
                                                   ),
                                                   Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Row(
                                                         children: [
@@ -303,8 +309,6 @@ class _TasksState extends State<Tasks> {
   }
 
   Future<Null> getData() async {
-    final prefs = await SharedPreferences.getInstance();
-    user = User.fromJson(jsonDecode(prefs.getString('user')!));
     if (user?.employee?.privileges == 'Admin') {
       list = await taskAPI().tasksForAdmin(user);
     } else {
@@ -329,5 +333,16 @@ class _TasksState extends State<Tasks> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Ошибка удаления задачи')));
     }
+  }
+
+  Future<void> updateUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    user = User.fromJson(jsonDecode(prefs.getString('user')!));
+    String? response = await taskAPI().updateUser(user);
+    user = User.fromJson(jsonDecode(response!));
+    prefs.setString('user', response!);
+    setState(() {
+      getData();
+    });
   }
 }

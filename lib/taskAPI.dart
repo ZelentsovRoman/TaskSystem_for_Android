@@ -145,6 +145,20 @@ class taskAPI {
     }
   }
 
+  Future<String?> updateUser(User? user) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.update);
+      var response = await http.post(url, body: user?.toJson().toString());
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   Future<Company?> checkCompany(Company? company) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getCompany);

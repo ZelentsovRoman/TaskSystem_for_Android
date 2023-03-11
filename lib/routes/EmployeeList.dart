@@ -20,7 +20,7 @@ class EmployeeList extends StatefulWidget {
 class _EmployeeListState extends State<EmployeeList> {
   @override
   void initState() {
-    getData();
+    updateUser();
     super.initState();
   }
 
@@ -188,10 +188,19 @@ class _EmployeeListState extends State<EmployeeList> {
   }
 
   Future<Null> getData() async {
-    final prefs = await SharedPreferences.getInstance();
-    user = User.fromJson(jsonDecode(prefs.getString('user')!));
     list = await taskAPI().allEmployee(user);
     setState(() {});
+  }
+
+  Future<void> updateUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    user = User.fromJson(jsonDecode(prefs.getString('user')!));
+    String? response = await taskAPI().updateUser(user);
+    user = User.fromJson(jsonDecode(response!));
+    prefs.setString('user', response!);
+    setState(() {
+      getData();
+    });
   }
 
   void logout() async {

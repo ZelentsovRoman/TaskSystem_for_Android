@@ -17,4 +17,5 @@ class ApiConstants {
   static String TaskForUser = '/TaskForUser';
   static String saveCompany = '/saveCompany';
   static String getCompany = '/getCompany';
+  static String update = '/update';
 }

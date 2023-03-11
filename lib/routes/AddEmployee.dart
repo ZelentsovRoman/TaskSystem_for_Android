@@ -27,11 +27,11 @@ class _AddEmployeeState extends State<AddEmployee> {
 
   @override
   void initState() {
-    getData();
+    updateUser();
     super.initState();
   }
 
-  late User _user;
+  User? _user;
 
   @override
   Widget build(BuildContext context) {
@@ -264,6 +264,15 @@ class _AddEmployeeState extends State<AddEmployee> {
     );
   }
 
+  Future<void> updateUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    _user = User.fromJson(jsonDecode(prefs.getString('user')!));
+    String? response = await taskAPI().updateUser(_user);
+    _user = User.fromJson(jsonDecode(response!));
+    prefs.setString('user', response!);
+    setState(() {});
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -284,10 +293,5 @@ class _AddEmployeeState extends State<AddEmployee> {
           .push(MaterialPageRoute(builder: (context) => EmployeeList()));
       setState(() {});
     }
-  }
-
-  Future<void> getData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _user = User.fromJson(jsonDecode(prefs.getString('user')!));
   }
 }

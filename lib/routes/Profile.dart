@@ -26,7 +26,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   void initState() {
-    getData();
+    updateUser();
     super.initState();
   }
 
@@ -77,18 +77,19 @@ class _ProfileState extends State<Profile> {
                     .push(MaterialPageRoute(builder: (context) => Tasks()));
               },
             ),
-            ListTile(
-              iconColor: Colors.white,
-              leading: Icon(Icons.people, size: 40),
-              title: Text(
-                'Список сотрудников',
-                style: TextStyle(fontSize: 20, color: Colors.white),
+            if (_user?.employee?.privileges == 'Admin')
+              ListTile(
+                iconColor: Colors.white,
+                leading: Icon(Icons.people, size: 40),
+                title: Text(
+                  'Список сотрудников',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => EmployeeList()));
+                },
               ),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => EmployeeList()));
-              },
-            ),
             Expanded(child: Text('')),
             ListTile(
               shape: Border(left: BorderSide(color: Colors.white, width: 7)),
@@ -117,10 +118,13 @@ class _ProfileState extends State<Profile> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-              child: Form(
-                  key: formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
+              child: RefreshIndicator(
+            onRefresh: updateUser,
+            child: Form(
+                key: formKey,
+                child: ListView(
+                  children: [
+                    Column(
                       children: [
                         const Padding(padding: EdgeInsets.only(top: 30)),
                         SizedBox(
@@ -241,7 +245,9 @@ class _ProfileState extends State<Profile> {
                         )
                       ],
                     ),
-                  )))
+                  ],
+                )),
+          ))
         ],
       )),
     );
@@ -260,7 +266,10 @@ class _ProfileState extends State<Profile> {
 
   Future<void> save(User user) async {
     bool resp = await taskAPI().editUser(user);
+    ScaffoldMessenger.of(context).clearSnackBars();
     if (resp) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Данные обновлены')));
       setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -268,14 +277,23 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  void getData() async {
+  Future<void> updateUser() async {
     final prefs = await SharedPreferences.getInstance();
     _user = User.fromJson(jsonDecode(prefs.getString('user')!));
-    login = _user!.login;
-    _Name..text = _user!.employee!.name!;
-    _LastName..text = _user!.employee!.lastName!;
-    _Login..text = _user!.login!;
-    _Password..text = _user!.password!;
+    String? response = await taskAPI().updateUser(_user);
+    _user = User.fromJson(jsonDecode(response!));
+    prefs.setString('user', response!);
+    setState(() {
+      getData();
+    });
+  }
+
+  Future<void> getData() async {
+    login = _user?.login;
+    _Name..text = (_user?.employee?.name)!;
+    _LastName..text = (_user?.employee?.lastName)!;
+    _Login..text = (_user?.login)!;
+    _Password..text = (_user?.password)!;
     setState(() {});
   }
 }
