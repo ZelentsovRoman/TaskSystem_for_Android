@@ -143,6 +143,56 @@ class _TaskScreenState extends State<TaskScreen> {
                       Column(
                         children: [
                           const Padding(padding: EdgeInsets.only(top: 30)),
+                          SizedBox(
+                              width: 350,
+                              child: Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Создано: ',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      const Padding(
+                                          padding: EdgeInsets.only(top: 30)),
+                                      Text(
+                                        'Статус: ',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${_task?.userId?.employee?.name ?? ""} ${_task?.userId?.employee?.lastName ?? ""}',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      const Padding(
+                                          padding: EdgeInsets.only(top: 30)),
+                                      Text(
+                                        '${_task?.statusId?.status ?? ''}',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color:
+                                                _task?.statusId?.statusId == 1
+                                                    ? Colors.red
+                                                    : Colors.green),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )),
+                          const Padding(padding: EdgeInsets.only(top: 30)),
                           _user?.employee?.privileges == 'Admin'
                               ? SizedBox(
                                   width: 350,

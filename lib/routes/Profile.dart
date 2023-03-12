@@ -129,6 +129,34 @@ class _ProfileState extends State<Profile> {
                         const Padding(padding: EdgeInsets.only(top: 30)),
                         SizedBox(
                             width: 350,
+                            child: Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Компания: ',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        '${_user?.employee?.company?.name ?? ''}',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ))
+                                  ],
+                                )
+                              ],
+                            )),
+                        const Padding(padding: EdgeInsets.only(top: 30)),
+                        SizedBox(
+                            width: 350,
                             child: TextFormField(
                               validator: (value) {
                                 if (value?.isEmpty ?? true) {
