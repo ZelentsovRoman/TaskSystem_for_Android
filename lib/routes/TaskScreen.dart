@@ -254,10 +254,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                             final newDate =
                                                 await showDateRangePicker(
                                                     context: context,
-                                                    // locale: const Locale('ru'),
-                                                    firstDate: DateTime(
-                                                        DateTime.now().year -
-                                                            5),
+                                                    firstDate: DateTime.now(),
                                                     lastDate: DateTime(
                                                         DateTime.now().year +
                                                             5),

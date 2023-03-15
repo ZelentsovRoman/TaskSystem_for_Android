@@ -182,8 +182,7 @@ class _AddTaskState extends State<AddTask> {
                                             .add(Duration(hours: 24)));
                                     final newDate = await showDateRangePicker(
                                         context: context,
-                                        firstDate:
-                                            DateTime(DateTime.now().year - 5),
+                                        firstDate: DateTime.now(),
                                         lastDate:
                                             DateTime(DateTime.now().year + 5),
                                         initialDateRange:
