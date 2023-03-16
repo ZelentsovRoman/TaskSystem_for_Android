@@ -15,6 +15,7 @@ class Task {
   User? userId;
   int? taskId;
   String? description;
+  String? priority;
   String? date;
   String? dateStart;
   String? dateEnd;
@@ -23,7 +24,7 @@ class Task {
 
   Task(this.employeeId, this.userId, this.date, this.dateStart, this.dateEnd,
       this.statusId,
-      {this.description, this.listSubtask, this.taskId});
+      {this.description, this.listSubtask, this.taskId, this.priority});
 
   Task.fromJson(Map<String, dynamic> json) {
     employeeId = json['employeeId'] != null
@@ -32,6 +33,7 @@ class Task {
     userId = json['userId'] != null ? new User.fromJson(json['userId']) : null;
     taskId = json['taskId'];
     description = json['description'];
+    priority = json['priority'];
     date = json['date'];
     dateStart = json['dateStart'];
     dateEnd = json['dateEnd'];
@@ -49,6 +51,7 @@ class Task {
     }
     data['taskId'] = this.taskId;
     data['description'] = this.description;
+    data['priority'] = this.priority;
     data['date'] = this.date;
     data['dateStart'] = this.dateStart;
     data['dateEnd'] = this.dateEnd;

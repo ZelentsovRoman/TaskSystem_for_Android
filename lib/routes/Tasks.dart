@@ -200,10 +200,11 @@ class _TasksState extends State<Tasks> {
                                                         fontSize: 20),
                                                   ),
                                                   Text(
-                                                    'от ${list?[index].date?.substring(0, 10)}',
+                                                    '${list?[index].priority}',
                                                     style: TextStyle(
-                                                        // fontWeight: FontWeight.bold,
-                                                        fontSize: 18),
+                                                        fontSize: 18,
+                                                        color: priorityColor(
+                                                            "${list?[index].priority}")),
                                                   ),
                                                 ],
                                                 mainAxisAlignment:
@@ -344,5 +345,16 @@ class _TasksState extends State<Tasks> {
     setState(() {
       getData();
     });
+  }
+
+  priorityColor(String priority) {
+    switch (priority) {
+      case "Низкий":
+        return Colors.green;
+      case "Средний":
+        return Colors.orange;
+      case "Высокий":
+        return Colors.red;
+    }
   }
 }

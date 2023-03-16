@@ -21,25 +21,39 @@ class AddTask extends StatefulWidget {
   State<AddTask> createState() => _AddTaskState();
 }
 
-class _AddTaskState extends State<AddTask> {
-  final formKey = GlobalKey<FormState>();
+class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  late TabController _tabController;
   Employee? employee;
-  String? description;
+  String description = '';
   DateTime date = DateTime.now();
   late DateTime dateStart;
   late DateTime dateEnd;
   late Status statusId;
+  var priority;
+  bool form = false;
   List<Status>? statuses;
+  late dynamic phys = NeverScrollableScrollPhysics();
   DateTimeRange? dateTimeRange;
   List<DropdownMenuItem<Employee>>? dropdownvalues;
   final _textEditingController = TextEditingController();
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
   List<Subtask>? listSubtasks = [];
   late User _user;
+  List<DropdownMenuItem<String>> priorities =
+      <String>["Низкий", "Средний", "Высокий"].map((String value) {
+    return DropdownMenuItem<String>(
+      value: value,
+      child: Text(value),
+    );
+  }).toList();
+  static const List<Tab> myTabs = <Tab>[
+    Tab(child: Text('Информация о задаче')),
+    Tab(child: Text('Подзадачи')),
+  ];
 
   @override
   void initState() {
+    _tabController = TabController(length: 2, vsync: this);
     updateUser();
     super.initState();
   }
@@ -126,216 +140,361 @@ class _AddTaskState extends State<AddTask> {
           ],
         ),
       ),
-      body: SafeArea(
-          child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-              child: Form(
-                  key: formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Padding(padding: EdgeInsets.only(top: 30)),
-                        SizedBox(
-                            width: 350,
-                            child: DropdownButtonFormField<Employee>(
-                                decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                    labelText: 'Исполнитель'),
-                                value: employee,
-                                onChanged: (Employee? newEmployee) {
-                                  setState(() {
-                                    employee = newEmployee!;
-                                  });
-                                },
-                                items: dropdownvalues)),
-                        const Padding(padding: EdgeInsets.only(top: 30)),
-                        SizedBox(
-                          width: 350,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  child: TextFormField(
-                                validator: (value) {
-                                  if (value?.isEmpty ?? true) {
-                                    return 'Выберите дату начала и окончания';
-                                  }
-                                  return null;
-                                },
-                                readOnly: true,
-                                controller: _textEditingController,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                    labelText: 'Дата начала и окончания'),
-                              )),
-                              IconButton(
-                                  onPressed: () async {
-                                    final initialDateRange = DateTimeRange(
-                                        start: DateTime.now(),
-                                        end: DateTime.now()
-                                            .add(Duration(hours: 24)));
-                                    final newDate = await showDateRangePicker(
-                                        context: context,
-                                        firstDate: DateTime.now(),
-                                        lastDate:
-                                            DateTime(DateTime.now().year + 5),
-                                        initialDateRange:
-                                            dateTimeRange ?? initialDateRange);
-                                    if (newDate != null) {
-                                      dateTimeRange = newDate;
-                                      _textEditingController
-                                        ..text =
-                                            '${DateFormat('dd-MM-yyyy').format(dateTimeRange!.start)} ~ ${DateFormat('dd-MM-yyyy').format(dateTimeRange!.end)}';
-                                      setState(() {});
-                                    } else
-                                      return;
+      body: Padding(
+        padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+        child: Column(
+          children: [
+            TabBar(
+              tabs: myTabs,
+              onTap: (index) {
+                if (index == 1) {
+                  setState(() {
+                    if (formKey.currentState!.validate()) {
+                      _tabController.index = index;
+                    } else
+                      _tabController.index = 0;
+                  });
+                }
+              },
+              controller: _tabController,
+              labelColor: Colors.white,
+              unselectedLabelColor: Color(0xFF2D3748),
+              indicator: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                  color: Color(0xFF2D3748)),
+            ),
+            Expanded(
+                child: TabBarView(
+                    controller: _tabController,
+                    physics: phys,
+                    children: [
+                  SafeArea(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          child: Form(
+                              onChanged: () => {
+                                    if (formKey.currentState!.validate())
+                                      {
+                                        phys = ClampingScrollPhysics(),
+                                        form = true
+                                      }
                                   },
-                                  color: Colors.grey,
-                                  icon: Icon(Icons.event))
-                            ],
-                          ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(top: 30)),
-                        SizedBox(
-                            width: 350,
-                            child: TextFormField(
-                              validator: (value) {},
-                              onChanged: (value) {
-                                description = value;
-                                setState(() {});
-                              },
-                              maxLines: 5,
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  isDense: true,
-                                  labelText: 'Описание'),
-                            )),
-                        const Padding(padding: EdgeInsets.only(top: 30)),
-                        SizedBox(
-                          width: 350,
-                          child: ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: listSubtasks?.length ?? 0,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Transform.scale(
-                                        child: Checkbox(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(2.0),
-                                            ),
-                                            side: BorderSide(
-                                                width: 1, color: Colors.grey),
-                                            value: listSubtasks?[index].value,
-                                            activeColor: Color(0xFF2D3748),
-                                            onChanged: (value) {
-                                              listSubtasks?[index].value =
-                                                  value;
-                                              setState(() {});
-                                            }),
-                                        scale: 2.8,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: TextFormField(
-                                          validator: (value) {},
-                                          onChanged: (value) {
-                                            listSubtasks?[index].description =
-                                                value;
-                                            setState(() {});
-                                          },
+                              key: formKey,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                        width: 350,
+                                        child: DropdownButtonFormField<String?>(
                                           decoration: const InputDecoration(
                                               border: OutlineInputBorder(),
                                               isDense: true,
-                                              labelText: 'Описание подзадачи'),
+                                              labelText: 'Приоритет'),
+                                          value: priority,
+                                          onChanged: (String? prior) {
+                                            setState(() {
+                                              priority = prior;
+                                            });
+                                          },
+                                          items: priorities,
+                                        )),
+                                    const Padding(
+                                        padding: EdgeInsets.only(top: 30)),
+                                    SizedBox(
+                                        width: 350,
+                                        child: DropdownButtonFormField<
+                                                Employee>(
+                                            decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                isDense: true,
+                                                labelText: 'Исполнитель'),
+                                            validator: (element) {
+                                              if (element == null) {
+                                                return 'Выберите исполнителя';
+                                              }
+                                              return null;
+                                            },
+                                            value: employee,
+                                            onChanged: (Employee? newEmployee) {
+                                              setState(() {
+                                                employee = newEmployee!;
+                                              });
+                                            },
+                                            items: dropdownvalues)),
+                                    const Padding(
+                                        padding: EdgeInsets.only(top: 30)),
+                                    SizedBox(
+                                      width: 350,
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                              child: TextFormField(
+                                            validator: (value) {
+                                              if (value?.isEmpty ?? true) {
+                                                return 'Выберите дату начала и окончания';
+                                              }
+                                              return null;
+                                            },
+                                            readOnly: true,
+                                            controller: _textEditingController,
+                                            onChanged: (value) {
+                                              setState(() {});
+                                            },
+                                            decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                isDense: true,
+                                                labelText:
+                                                    'Дата начала и окончания'),
+                                          )),
+                                          IconButton(
+                                              onPressed: () async {
+                                                final initialDateRange =
+                                                    DateTimeRange(
+                                                        start: DateTime.now(),
+                                                        end: DateTime.now().add(
+                                                            Duration(
+                                                                hours: 24)));
+                                                final newDate =
+                                                    await showDateRangePicker(
+                                                        context: context,
+                                                        firstDate:
+                                                            DateTime.now(),
+                                                        lastDate: DateTime(
+                                                            DateTime.now()
+                                                                    .year +
+                                                                5),
+                                                        initialDateRange:
+                                                            dateTimeRange ??
+                                                                initialDateRange);
+                                                if (newDate != null) {
+                                                  dateTimeRange = newDate;
+                                                  _textEditingController
+                                                    ..text =
+                                                        '${DateFormat('dd-MM-yyyy').format(dateTimeRange!.start)} ~ ${DateFormat('dd-MM-yyyy').format(dateTimeRange!.end)}';
+                                                  setState(() {});
+                                                } else
+                                                  return;
+                                              },
+                                              color: Colors.grey,
+                                              icon: Icon(Icons.event))
+                                        ],
+                                      ),
+                                    ),
+                                    const Padding(
+                                        padding: EdgeInsets.only(top: 30)),
+                                    SizedBox(
+                                        width: 350,
+                                        child: TextFormField(
+                                          validator: (value) {},
+                                          onChanged: (value) {
+                                            description = value;
+                                            setState(() {});
+                                          },
+                                          maxLines: 5,
+                                          decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              isDense: true,
+                                              labelText: 'Описание'),
+                                        )),
+                                    const Padding(
+                                        padding: EdgeInsets.only(top: 30)),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        if (formKey.currentState!.validate()) {
+                                          int checkboxesFilled = 0;
+                                          if (listSubtasks?.length != 0) {
+                                            for (Subtask item
+                                                in listSubtasks!) {
+                                              if (item.value == false) {
+                                                checkboxesFilled++;
+                                              }
+                                            }
+                                            if (checkboxesFilled > 0) {
+                                              statusId = statuses![0];
+                                            } else {
+                                              statusId = statuses![1];
+                                            }
+                                          } else {
+                                            statusId = statuses![0];
+                                          }
+                                          Task task = Task(
+                                              employee,
+                                              _user,
+                                              DateFormat('dd-MM-yyyy')
+                                                  .format(date),
+                                              DateFormat('dd-MM-yyyy')
+                                                  .format(dateTimeRange!.start),
+                                              DateFormat('dd-MM-yyyy')
+                                                  .format(dateTimeRange!.end),
+                                              statusId,
+                                              description: description == ''
+                                                  ? '\"\"'
+                                                  : description,
+                                              priority: priority,
+                                              listSubtask: subtaskModelToJson(
+                                                  listSubtasks!));
+                                          // print(task.toJson().toString());
+                                          await save(task);
+                                        } else {
+                                          // print(formKey.currentState!.validate());
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF2D3748),
+                                      ),
+                                      child: const Text(
+                                        'Добавить',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )))
+                    ],
+                  )),
+                  SafeArea(
+                      child: Row(
+                    children: [
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          Column(
+                            children: [
+                              const Padding(padding: EdgeInsets.only(top: 30)),
+                              SizedBox(
+                                width: 350,
+                                child: ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: listSubtasks?.length ?? 0,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        margin: EdgeInsets.only(bottom: 20),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Transform.scale(
+                                              child: Checkbox(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2.0),
+                                                  ),
+                                                  side: BorderSide(
+                                                      width: 1,
+                                                      color: Colors.grey),
+                                                  value: listSubtasks?[index]
+                                                      .value,
+                                                  activeColor:
+                                                      Color(0xFF2D3748),
+                                                  onChanged: (value) {
+                                                    listSubtasks?[index].value =
+                                                        value;
+                                                    setState(() {});
+                                                  }),
+                                              scale: 2.8,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Expanded(
+                                              child: TextFormField(
+                                                validator: (value) {},
+                                                onChanged: (value) {
+                                                  listSubtasks?[index]
+                                                      .description = value;
+                                                  setState(() {});
+                                                },
+                                                decoration: const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    isDense: true,
+                                                    labelText:
+                                                        'Описание подзадачи'),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                listSubtasks!.removeAt(index);
+                                                setState(() {});
+                                              },
+                                              icon: Icon(Icons.delete),
+                                              color: Colors.grey,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          listSubtasks!.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        icon: Icon(Icons.delete),
-                                        color: Colors.grey,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            listSubtasks?.add(Subtask('', false));
-                            setState(() {});
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF2D3748),
-                          ),
-                          child: const Text(
-                            'Добавить подзадачу',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              int checkboxesFilled = 0;
-                              if (listSubtasks?.length != 0) {
-                                for (Subtask item in listSubtasks!) {
-                                  if (item.value == false) {
-                                    checkboxesFilled++;
+                                      );
+                                    }),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  listSubtasks?.add(Subtask('', false));
+                                  setState(() {});
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF2D3748),
+                                ),
+                                child: const Text(
+                                  'Добавить подзадачу',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  int checkboxesFilled = 0;
+                                  if (listSubtasks?.length != 0) {
+                                    for (Subtask item in listSubtasks!) {
+                                      if (item.value == false) {
+                                        checkboxesFilled++;
+                                      }
+                                    }
+                                    if (checkboxesFilled > 0) {
+                                      statusId = statuses![0];
+                                    } else {
+                                      statusId = statuses![1];
+                                    }
+                                  } else {
+                                    statusId = statuses![0];
                                   }
-                                }
-                                if (checkboxesFilled > 0) {
-                                  statusId = statuses![0];
-                                } else {
-                                  statusId = statuses![1];
-                                }
-                              } else {
-                                statusId = statuses![0];
-                              }
-                              Task task = Task(
-                                  employee,
-                                  _user,
-                                  DateFormat('dd-MM-yyyy').format(date),
-                                  DateFormat('dd-MM-yyyy')
-                                      .format(dateTimeRange!.start),
-                                  DateFormat('dd-MM-yyyy')
-                                      .format(dateTimeRange!.end),
-                                  statusId,
-                                  description: description ?? '\"\"',
-                                  listSubtask:
-                                      subtaskModelToJson(listSubtasks!));
-                              await save(task);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF2D3748),
-                          ),
-                          child: const Text(
-                            'Добавить',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
-                      ],
-                    ),
-                  )))
-        ],
-      )),
+                                  Task task = Task(
+                                      employee,
+                                      _user,
+                                      DateFormat('dd-MM-yyyy').format(date),
+                                      DateFormat('dd-MM-yyyy')
+                                          .format(dateTimeRange!.start),
+                                      DateFormat('dd-MM-yyyy')
+                                          .format(dateTimeRange!.end),
+                                      statusId,
+                                      description: description == ''
+                                          ? '\"\"'
+                                          : description,
+                                      priority: priority,
+                                      listSubtask:
+                                          subtaskModelToJson(listSubtasks!));
+                                  // print(task.toJson().toString());
+                                  await save(task);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF2D3748),
+                                ),
+                                child: const Text(
+                                  'Добавить',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ))
+                    ],
+                  ))
+                ]))
+          ],
+        ),
+      ),
     );
   }
 
@@ -372,6 +531,7 @@ class _AddTaskState extends State<AddTask> {
   void getData() async {
     statuses = await taskAPI().getStatuses();
     dropdownvalues = await taskAPI().getEmployee(_user);
+    priority = priorities.first.value;
     setState(() {});
   }
 }
