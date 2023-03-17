@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:tasksystem_for_android/models/Status.dart';
 import 'package:tasksystem_for_android/models/Subtask.dart';
 import 'package:tasksystem_for_android/routes/EmployeeList.dart';
@@ -27,9 +28,9 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
   Employee? employee;
   String description = '';
   DateTime date = DateTime.now();
-  late DateTime dateStart;
-  late DateTime dateEnd;
-  late Status statusId;
+  String? dateStart;
+  String? dateEnd;
+  Status? statusId;
   var priority;
   bool form = false;
   List<Status>? statuses;
@@ -50,6 +51,12 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
     Tab(child: Text('Информация о задаче')),
     Tab(child: Text('Подзадачи')),
   ];
+  String _range = '';
+  PickerDateRange initRange = PickerDateRange(
+      DateTime.now(),
+      DateTime.now().add(Duration(days: 1)).weekday == 6
+          ? DateTime.now().add(Duration(days: 3))
+          : DateTime.now().add(Duration(days: 1)));
 
   @override
   void initState() {
@@ -242,43 +249,131 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                             onChanged: (value) {
                                               setState(() {});
                                             },
+                                            onTap: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                        content: SizedBox(
+                                                      width: 350,
+                                                      height: 350,
+                                                      child: Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            child:
+                                                                SfDateRangePicker(
+                                                              startRangeSelectionColor:
+                                                                  Color(
+                                                                      0xFF2D3748),
+                                                              endRangeSelectionColor:
+                                                                  Color(
+                                                                      0xFF2D3748),
+                                                              rangeSelectionColor:
+                                                                  Color(
+                                                                      0xFFAAAEB5),
+                                                              onCancel: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              navigationDirection:
+                                                                  DateRangePickerNavigationDirection
+                                                                      .vertical,
+                                                              monthViewSettings:
+                                                                  DateRangePickerMonthViewSettings(
+                                                                      firstDayOfWeek:
+                                                                          1),
+                                                              onSelectionChanged:
+                                                                  (args) => {
+                                                                setState(() {
+                                                                  if (args.value
+                                                                      is PickerDateRange) {
+                                                                    dateStart =
+                                                                        '${DateFormat('dd-MM-yyyy').format(args.value.startDate)}';
+                                                                    dateEnd =
+                                                                        '${DateFormat('dd-MM-yyyy').format(args.value.endDate ?? args.value.startDate)}';
+                                                                  } else if (args
+                                                                          .value
+                                                                      is DateTime) {
+                                                                    final DateTime
+                                                                        selectedDate =
+                                                                        args.value;
+                                                                  } else if (args
+                                                                          .value
+                                                                      is List<
+                                                                          DateTime>) {
+                                                                    final List<
+                                                                            DateTime>
+                                                                        selectedDates =
+                                                                        args.value;
+                                                                  } else {
+                                                                    final List<
+                                                                            PickerDateRange>
+                                                                        selectedRanges =
+                                                                        args.value;
+                                                                  }
+                                                                  setState(
+                                                                      () {});
+                                                                })
+                                                              },
+                                                              onSubmit:
+                                                                  (value) => {
+                                                                if (dateStart ==
+                                                                        null ||
+                                                                    dateEnd ==
+                                                                        null)
+                                                                  {
+                                                                    dateStart =
+                                                                        '${DateFormat('dd-MM-yyyy').format(initRange.startDate!)}',
+                                                                    dateEnd =
+                                                                        '${DateFormat('dd-MM-yyyy').format(initRange.endDate ?? initRange.startDate!)}'
+                                                                  },
+                                                                _range =
+                                                                    '${dateStart} ~ ${dateEnd}',
+                                                                _textEditingController
+                                                                  ..text =
+                                                                      _range,
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop()
+                                                              },
+                                                              enablePastDates:
+                                                                  false,
+                                                              maxDate: DateTime(
+                                                                  DateTime.now()
+                                                                          .year +
+                                                                      5),
+                                                              initialSelectedRange:
+                                                                  initRange,
+                                                              showActionButtons:
+                                                                  true,
+                                                              selectionMode:
+                                                                  DateRangePickerSelectionMode
+                                                                      .range,
+                                                              selectableDayPredicate: (DateTime
+                                                                      val) =>
+                                                                  val.weekday ==
+                                                                              6 ||
+                                                                          val.weekday ==
+                                                                              7
+                                                                      ? false
+                                                                      : true,
+                                                            ),
+                                                            width: 350,
+                                                            height: 350,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ));
+                                                  });
+                                            },
                                             decoration: const InputDecoration(
                                                 border: OutlineInputBorder(),
                                                 isDense: true,
                                                 labelText:
                                                     'Дата начала и окончания'),
                                           )),
-                                          IconButton(
-                                              onPressed: () async {
-                                                final initialDateRange =
-                                                    DateTimeRange(
-                                                        start: DateTime.now(),
-                                                        end: DateTime.now().add(
-                                                            Duration(
-                                                                hours: 24)));
-                                                final newDate =
-                                                    await showDateRangePicker(
-                                                        context: context,
-                                                        firstDate:
-                                                            DateTime.now(),
-                                                        lastDate: DateTime(
-                                                            DateTime.now()
-                                                                    .year +
-                                                                5),
-                                                        initialDateRange:
-                                                            dateTimeRange ??
-                                                                initialDateRange);
-                                                if (newDate != null) {
-                                                  dateTimeRange = newDate;
-                                                  _textEditingController
-                                                    ..text =
-                                                        '${DateFormat('dd-MM-yyyy').format(dateTimeRange!.start)} ~ ${DateFormat('dd-MM-yyyy').format(dateTimeRange!.end)}';
-                                                  setState(() {});
-                                                } else
-                                                  return;
-                                              },
-                                              color: Colors.grey,
-                                              icon: Icon(Icons.event))
                                         ],
                                       ),
                                     ),
@@ -324,10 +419,8 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                               _user,
                                               DateFormat('dd-MM-yyyy')
                                                   .format(date),
-                                              DateFormat('dd-MM-yyyy')
-                                                  .format(dateTimeRange!.start),
-                                              DateFormat('dd-MM-yyyy')
-                                                  .format(dateTimeRange!.end),
+                                              dateStart,
+                                              dateEnd,
                                               statusId,
                                               description: description == ''
                                                   ? '\"\"'
@@ -337,8 +430,6 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                                   listSubtasks!));
                                           // print(task.toJson().toString());
                                           await save(task);
-                                        } else {
-                                          // print(formKey.currentState!.validate());
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -463,10 +554,8 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                       employee,
                                       _user,
                                       DateFormat('dd-MM-yyyy').format(date),
-                                      DateFormat('dd-MM-yyyy')
-                                          .format(dateTimeRange!.start),
-                                      DateFormat('dd-MM-yyyy')
-                                          .format(dateTimeRange!.end),
+                                      dateStart,
+                                      dateEnd,
                                       statusId,
                                       description: description == ''
                                           ? '\"\"'
