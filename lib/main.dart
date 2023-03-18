@@ -11,6 +11,7 @@ import 'package:tasksystem_for_android/routes/Profile.dart';
 import 'package:tasksystem_for_android/routes/Register.dart';
 import 'package:tasksystem_for_android/routes/TaskScreen.dart';
 import 'package:tasksystem_for_android/routes/Tasks.dart';
+import 'package:tasksystem_for_android/taskAPI.dart';
 
 import 'models/User.dart';
 bool authCheck = false;
@@ -51,7 +52,14 @@ Future<bool> auth() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   User user = User.fromJson(jsonDecode(prefs.getString('user') ?? '{}'));
   if (user.login != null) {
-    return true;
+    String? response = await taskAPI().updateUser(user);
+    if (response == 'NOT_FOUND') {
+      return false;
+    } else {
+      user = User.fromJson(jsonDecode(response!));
+      prefs.setString('user', response!);
+      return true;
+    }
   } else {
     return false;
   }
