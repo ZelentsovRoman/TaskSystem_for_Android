@@ -54,20 +54,9 @@ class taskAPI {
     }
   }
 
-  Future<List<Task>?> tasksForAdmin(User? user) async {
+  Future<List<Task>?> allTasks(User? user) async {
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.TaskForAdmin);
-      var response = await http.post(url, body: user?.toJson().toString());
-      List<Task> list = taskModelFromJson(response.body);
-      return list;
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
-  Future<List<Task>?> tasksForUser(User? user) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.TaskForUser);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.allTasks);
       var response = await http.post(url, body: user?.toJson().toString());
       List<Task> list = taskModelFromJson(response.body);
       return list;
