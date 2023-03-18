@@ -598,11 +598,15 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     _user = User.fromJson(jsonDecode(prefs.getString('user')!));
     String? response = await taskAPI().updateUser(_user);
-    _user = User.fromJson(jsonDecode(response!));
-    prefs.setString('user', response!);
-    setState(() {
-      getData();
-    });
+    if (response == 'NOT_FOUND') {
+      logout();
+    } else {
+      _user = User.fromJson(jsonDecode(response!));
+      prefs.setString('user', response!);
+      setState(() {
+        getData();
+      });
+    }
   }
 
   Future<void> save(Task task) async {

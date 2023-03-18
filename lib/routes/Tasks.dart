@@ -127,7 +127,7 @@ class _TasksState extends State<Tasks> {
         children: [
           Expanded(
               child: RefreshIndicator(
-                  onRefresh: getData,
+                  onRefresh: updateUser,
                   key: _refreshIndicatorKey,
                   child: list?.length == 0
                       ? ListView(
@@ -340,11 +340,15 @@ class _TasksState extends State<Tasks> {
     final prefs = await SharedPreferences.getInstance();
     user = User.fromJson(jsonDecode(prefs.getString('user')!));
     String? response = await taskAPI().updateUser(user);
-    user = User.fromJson(jsonDecode(response!));
-    prefs.setString('user', response!);
-    setState(() {
-      getData();
-    });
+    if (response == 'NOT_FOUND') {
+      logout();
+    } else {
+      user = User.fromJson(jsonDecode(response!));
+      prefs.setString('user', response!);
+      setState(() {
+        getData();
+      });
+    }
   }
 
   priorityColor(String priority) {

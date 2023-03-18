@@ -18,7 +18,7 @@ class taskAPI {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.auth);
       var response = await http.post(url, body: user.toJson().toString());
-      if (response.body != '\"NOT_FOUND\"') {
+      if (response.statusCode != 404) {
         user = User.fromJson(jsonDecode(response.body));
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('user', response.body);
@@ -152,7 +152,7 @@ class taskAPI {
       if (response.statusCode == 200) {
         return response.body;
       } else {
-        return null;
+        return 'NOT_FOUND';
       }
     } catch (e) {
       log(e.toString());
