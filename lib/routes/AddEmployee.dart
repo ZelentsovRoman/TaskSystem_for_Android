@@ -268,9 +268,13 @@ class _AddEmployeeState extends State<AddEmployee> {
     final prefs = await SharedPreferences.getInstance();
     _user = User.fromJson(jsonDecode(prefs.getString('user')!));
     String? response = await taskAPI().updateUser(_user);
-    _user = User.fromJson(jsonDecode(response!));
-    prefs.setString('user', response!);
-    setState(() {});
+    if (response == 'NOT_FOUND') {
+      logout();
+    } else {
+      _user = User.fromJson(jsonDecode(response!));
+      prefs.setString('user', response!);
+      setState(() {});
+    }
   }
 
   Future<void> logout() async {

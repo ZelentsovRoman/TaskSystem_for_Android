@@ -196,11 +196,15 @@ class _EmployeeListState extends State<EmployeeList> {
     final prefs = await SharedPreferences.getInstance();
     user = User.fromJson(jsonDecode(prefs.getString('user')!));
     String? response = await taskAPI().updateUser(user);
-    user = User.fromJson(jsonDecode(response!));
-    prefs.setString('user', response!);
-    setState(() {
-      getData();
-    });
+    if (response == 'NOT_FOUND') {
+      logout();
+    } else {
+      user = User.fromJson(jsonDecode(response!));
+      prefs.setString('user', response!);
+      setState(() {
+        getData();
+      });
+    }
   }
 
   void logout() async {
