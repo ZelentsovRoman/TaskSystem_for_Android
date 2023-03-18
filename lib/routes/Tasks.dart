@@ -310,11 +310,7 @@ class _TasksState extends State<Tasks> {
   }
 
   Future<Null> getData() async {
-    if (user?.employee?.privileges == 'Admin') {
-      list = await taskAPI().tasksForAdmin(user);
-    } else {
-      list = await taskAPI().tasksForUser(user);
-    }
+    list = await taskAPI().allTasks(user);
     setState(() {});
   }
 

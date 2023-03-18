@@ -13,8 +13,7 @@ class ApiConstants {
   static String deleteTask = '/deleteTask';
   static String deleteUser = '/deleteUser';
   static String saveTask = '/saveTask';
-  static String TaskForAdmin = '/TaskForAdmin';
-  static String TaskForUser = '/TaskForUser';
+  static String allTasks = '/allTasks';
   static String saveCompany = '/saveCompany';
   static String getCompany = '/getCompany';
   static String update = '/update';

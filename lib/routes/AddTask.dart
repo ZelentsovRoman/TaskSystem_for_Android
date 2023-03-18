@@ -21,6 +21,15 @@ class AddTask extends StatefulWidget {
   @override
   State<AddTask> createState() => _AddTaskState();
 }
+extension DateTimeExtension on DateTime {
+  DateTime next(int day) {
+    return this.add(
+      Duration(
+        days: (day - this.weekday) % DateTime.daysPerWeek,
+      ),
+    );
+  }
+}
 
 class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -53,10 +62,14 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
   ];
   String _range = '';
   PickerDateRange initRange = PickerDateRange(
-      DateTime.now(),
+      (DateTime.now().weekday == 6 || DateTime.now().weekday == 7)
+          ? DateTime.now().next(DateTime.monday)
+          : DateTime.now(),
       DateTime.now().add(Duration(days: 1)).weekday == 6
           ? DateTime.now().add(Duration(days: 3))
-          : DateTime.now().add(Duration(days: 1)));
+          : ((DateTime.now().weekday == 6 || DateTime.now().weekday == 7)
+              ? DateTime.now().next(DateTime.tuesday)
+              : DateTime.now().add(Duration(days: 1))));
 
   @override
   void initState() {

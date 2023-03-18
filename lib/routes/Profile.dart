@@ -267,7 +267,7 @@ class _ProfileState extends State<Profile> {
                             backgroundColor: Color(0xFF2D3748),
                           ),
                           child: const Text(
-                            'Добавить',
+                            'Изменить данные',
                             style: TextStyle(color: Colors.white),
                           ),
                         )
