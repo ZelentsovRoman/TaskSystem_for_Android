@@ -393,6 +393,10 @@ class _TaskScreenState extends State<TaskScreen>
                                                                           Navigator.of(context)
                                                                               .pop();
                                                                         },
+                                                                        cancelText:
+                                                                            'Отмена',
+                                                                        confirmText:
+                                                                            'Ок',
                                                                         navigationDirection:
                                                                             DateRangePickerNavigationDirection.vertical,
                                                                         monthViewSettings:
@@ -574,7 +578,6 @@ class _TaskScreenState extends State<TaskScreen>
                       children: [
                         Expanded(
                             child: Container(
-                          alignment: Alignment.center,
                           child: RefreshIndicator(
                             onRefresh: getData,
                             child: Form(
@@ -583,6 +586,8 @@ class _TaskScreenState extends State<TaskScreen>
                                   children: [
                                     Column(
                                       children: [
+                                        const Padding(
+                                            padding: EdgeInsets.only(top: 10)),
                                         SizedBox(
                                           width: 350,
                                           child: ListView.builder(
