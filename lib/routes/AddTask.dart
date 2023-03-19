@@ -444,8 +444,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                                   ? '\"\"'
                                                   : description,
                                               priority: priority,
-                                              listSubtask: subtaskModelToJson(
-                                                  listSubtasks!));
+                                              subtasks: listSubtasks);
                                           // print(task.toJson().toString());
                                           await save(task);
                                         }
@@ -579,8 +578,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                           ? '\"\"'
                                           : description,
                                       priority: priority,
-                                      listSubtask:
-                                          subtaskModelToJson(listSubtasks!));
+                                      subtasks: listSubtasks);
                                   // print(task.toJson().toString());
                                   await save(task);
                                 },

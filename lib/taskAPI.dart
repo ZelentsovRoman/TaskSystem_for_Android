@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasksystem_for_android/models/Employee.dart';
-import 'package:tasksystem_for_android/models/Subtask.dart';
 import 'package:tasksystem_for_android/models/Task.dart';
 
 import 'ApiConstants.dart';
@@ -191,17 +190,6 @@ class taskAPI {
     }
   }
 
-  Future<List<Subtask>?> getSubtasks(String? index) async {
-    try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.getSubtasks + '/${index}');
-      var response = await http.get(url);
-      List<Subtask> list = subtaskModelFromJson(response.body);
-      return list;
-    } catch (e) {
-      log(e.toString());
-    }
-  }
 
   Future<Company?> saveCompany(Company? company) async {
     try {
