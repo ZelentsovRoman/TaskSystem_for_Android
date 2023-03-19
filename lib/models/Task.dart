@@ -4,6 +4,8 @@ import 'package:tasksystem_for_android/models/Employee.dart';
 import 'package:tasksystem_for_android/models/Status.dart';
 import 'package:tasksystem_for_android/models/User.dart';
 
+import 'Subtask.dart';
+
 List<Task> taskModelFromJson(String str) =>
     List<Task>.from(json.decode(str).map((x) => Task.fromJson(x)));
 
@@ -20,11 +22,11 @@ class Task {
   String? dateStart;
   String? dateEnd;
   Status? statusId;
-  String? listSubtask;
+  List<Subtask>? subtasks;
 
   Task(this.employeeId, this.userId, this.date, this.dateStart, this.dateEnd,
       this.statusId,
-      {this.description, this.listSubtask, this.taskId, this.priority});
+      {this.description, this.subtasks, this.taskId, this.priority});
 
   Task.fromJson(Map<String, dynamic> json) {
     employeeId = json['employeeId'] != null
@@ -36,6 +38,12 @@ class Task {
     priority = json['priority'];
     date = json['date'];
     dateStart = json['dateStart'];
+    if (json['subtasks'] != null) {
+      subtasks = <Subtask>[];
+      json['subtasks'].forEach((v) {
+        subtasks!.add(new Subtask.fromJson(v));
+      });
+    }
     dateEnd = json['dateEnd'];
     statusId =
         json['statusId'] != null ? new Status.fromJson(json['statusId']) : null;
@@ -53,12 +61,12 @@ class Task {
     data['description'] = this.description;
     data['priority'] = this.priority;
     data['date'] = this.date;
+    data['subtasks'] = subtaskModelToJson(this.subtasks!);
     data['dateStart'] = this.dateStart;
     data['dateEnd'] = this.dateEnd;
     if (this.statusId != null) {
       data['statusId'] = this.statusId!.toJson();
     }
-    data['subtasks'] = this.listSubtask;
     return data;
   }
 }

@@ -543,9 +543,7 @@ class _TaskScreenState extends State<TaskScreen>
                                                       _task!.description == ''
                                                           ? '\"\"'
                                                           : _task!.description,
-                                                  listSubtask:
-                                                      subtaskModelToJson(
-                                                          listSubtasks!),
+                                                  subtasks: listSubtasks,
                                                   taskId: _task!.taskId,
                                                   priority: _task!.priority);
                                               await save(task);
@@ -729,9 +727,7 @@ class _TaskScreenState extends State<TaskScreen>
                                                       _task!.description == ''
                                                           ? '\"\"'
                                                           : _task!.description,
-                                                  listSubtask:
-                                                      subtaskModelToJson(
-                                                          listSubtasks!),
+                                                  subtasks: listSubtasks,
                                                   taskId: _task!.taskId,
                                                   priority: _task!.priority);
                                               await save(task);
@@ -788,13 +784,13 @@ class _TaskScreenState extends State<TaskScreen>
     String args = widget.string;
     statuses = await taskAPI().getStatuses();
     dropdownvalues = await taskAPI().getEmployee(_user);
-    _task = (await taskAPI().getTask(args))!;
+    _task = await taskAPI().getTask(args);
     _textEditingController..text = '${_task!.dateStart} ~ ${_task!.dateEnd}';
     _PriorityController..text = '${_task!.priority}';
     _DescriptionController..text = '${_task!.description}';
     _EmployeeController
       ..text = '${_task!.employeeId!.name} ${_task!.employeeId!.lastName}';
-    listSubtasks = await taskAPI().getSubtasks(args);
+    listSubtasks = _task!.subtasks;
     employee = dropdownvalues!
         .firstWhere((element) =>
             element.value?.employeeId == _task!.employeeId?.employeeId)
