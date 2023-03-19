@@ -232,21 +232,6 @@ class taskAPI {
     return false;
   }
 
-  Future<bool> saveNewTask(Task? task) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveNewTask);
-      var response = await http.post(url, body: task?.toJson().toString());
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      log(e.toString());
-    }
-    return false;
-  }
-
   Future<bool> saveTask(Task? task) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.saveTask);

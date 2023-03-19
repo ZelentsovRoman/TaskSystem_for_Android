@@ -21,6 +21,7 @@ class AddTask extends StatefulWidget {
   @override
   State<AddTask> createState() => _AddTaskState();
 }
+
 extension DateTimeExtension on DateTime {
   DateTime next(int day) {
     return this.add(
@@ -183,6 +184,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                   borderRadius: BorderRadius.all(Radius.circular(50)),
                   color: Color(0xFF2D3748)),
             ),
+            const Padding(padding: EdgeInsets.only(top: 30)),
             Expanded(
                 child: TabBarView(
                     controller: _tabController,
@@ -290,6 +292,9 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                                                         context)
                                                                     .pop();
                                                               },
+                                                              cancelText:
+                                                                  'Отмена',
+                                                              confirmText: 'Ок',
                                                               navigationDirection:
                                                                   DateRangePickerNavigationDirection
                                                                       .vertical,
@@ -466,7 +471,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                         children: [
                           Column(
                             children: [
-                              const Padding(padding: EdgeInsets.only(top: 30)),
+                              const Padding(padding: EdgeInsets.only(top: 10)),
                               SizedBox(
                                 width: 350,
                                 child: ListView.builder(
@@ -623,7 +628,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
   }
 
   Future<void> save(Task task) async {
-    bool resp = await taskAPI().saveNewTask(task);
+    bool resp = await taskAPI().saveTask(task);
     if (resp) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => Tasks()));

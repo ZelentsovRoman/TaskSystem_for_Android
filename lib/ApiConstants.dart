@@ -5,7 +5,6 @@ class ApiConstants {
   static String editUser = '/editUser';
   static String allEmployee = '/allEmployee';
   static String getStatuses = '/getStatuses';
-  static String saveNewTask = '/saveNewTask';
   static String saveEmployee = '/saveEmployee';
   static String saveUser = '/saveUser';
   static String getTask = '/getTask';
