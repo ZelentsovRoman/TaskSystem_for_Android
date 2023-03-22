@@ -1,5 +1,5 @@
 class ApiConstants {
-  static String baseUrl = 'http://192.168.0.108:3000/api';
+  static String baseUrl = 'http://192.168.0.105:8080/api';
   static String auth = '/auth';
   static String findUser = '/findUser';
   static String editUser = '/editUser';
