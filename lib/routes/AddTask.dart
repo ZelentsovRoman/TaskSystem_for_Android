@@ -192,7 +192,6 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                     children: [
                   SafeArea(
                       child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
                           child: Form(
@@ -204,8 +203,10 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                       }
                                   },
                               key: formKey,
-                              child: SingleChildScrollView(
-                                child: Column(
+                              child: ListView(children: [
+                                const Padding(
+                                    padding: EdgeInsets.only(top: 10)),
+                                Column(
                                   children: [
                                     SizedBox(
                                         width: 350,
@@ -459,7 +460,7 @@ class _AddTaskState extends State<AddTask> with SingleTickerProviderStateMixin {
                                     )
                                   ],
                                 ),
-                              )))
+                              ])))
                     ],
                   )),
                   SafeArea(
